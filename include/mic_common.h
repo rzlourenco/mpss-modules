@@ -90,6 +90,12 @@ extern "C" {
 #define GET_MAX(a, b)	( ((a) > (b)) ? (a) : (b) )
 #define GET_MIN(a, b)	( ((a) < (b)) ? (a) : (b) )
 
+#if LINUX_VERSION_CODE > KERNEL_VERSION(3,14,4)
+#define STRUCT_FILE_GET_DEV(f) ((f)->f_inode->i_rdev)
+#else
+#define STRUCT_FILE_GET_DEV(f) ((f)->f_dentry->d_inode->i_rdev)
+#endif
+
 // System Interrupt Cause Read Register 0
 #define SBOX_SICR0_DBR(x)		((x) & 0xf)
 #define SBOX_SICR0_DMA(x)		(((x) >> 8) & 0xff)
@@ -415,7 +421,11 @@ typedef struct _mic_ctx_t {
 	product_family_t	bi_family;
 	struct board_info	*bd_info;
 	sysfs_info_t		sysfs_info;
+#if LINUX_VERSION_CODE > KERNEL_VERSION(3,14,4)
+        struct kernfs_node	*sysfs_state;
+#else
 	struct sysfs_dirent	*sysfs_state;
+#endif
 	spinlock_t		sysfs_lock;
 	mic_dma_handle_t	dma_handle;
 	uint32_t		boot_mem;

@@ -1030,8 +1030,14 @@ micvnet_init_netdev(struct micvnet_info *vnet_info)
 	struct net_device *dev_vnet;
 	int ret = 0;
 
+#if LINUX_VERSION_CODE > KERNEL_VERSION(3,14,4)
+	if ((dev_vnet = (struct net_device *)alloc_netdev(sizeof(struct micvnet_info), "mic%d", 
+					   NET_NAME_ENUM,
+					   micvnet_setup)) == NULL) {
+#else
 	if ((dev_vnet = (struct net_device *)alloc_netdev(sizeof(struct micvnet_info), "mic%d", 
 					   micvnet_setup)) == NULL) {
+#endif
 		printk(KERN_ERR "%s: alloc_netdev failed\n", __func__);
 		return -ENOMEM;
 	}

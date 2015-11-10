@@ -99,7 +99,11 @@ micscif_flush(struct file *f, fl_owner_t id)
 	struct endpt *ep;
 
 	priv = (struct mic_priv *)f->private_data;
+#if LINUX_VERSION_CODE > KERNEL_VERSION(3,14,4)
+	dev = f->f_inode->i_rdev;
+#else
 	dev = f->f_dentry->d_inode->i_rdev;
+#endif
 	if (MINOR(dev) != 1) // SCIF MINOR
 		return 0;
 
